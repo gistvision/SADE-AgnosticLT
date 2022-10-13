@@ -20,12 +20,9 @@
         }
     },
     "optimizer": {
-        "type": "SGD",
+        "type": "Adam",
         "args":{
-            "lr": 0.01,
-            "weight_decay": 5e-4,
-            "momentum": 0.9,
-            "nesterov": true
+            "lr": 0.01
         }
     },
     "add_extra_info": true,
