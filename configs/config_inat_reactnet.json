@@ -22,7 +22,7 @@
     "optimizer": {
         "type": "SGD",
         "args":{
-            "lr": 0.025,
+            "lr": 0.01,
             "weight_decay": 5e-4,
             "momentum": 0.9,
             "nesterov": true
@@ -47,7 +47,7 @@
     },
     "trainer": {
         "epochs": 180,
-        "save_dir": "saved/imagenet/sade_e180_inv2_bs64_lr0.025",
+        "save_dir": "saved/inat/reactnet_SGD",
         "save_period": 180,
         "verbosity": 2,
         "monitor": "max val_accuracy",
