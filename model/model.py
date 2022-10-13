@@ -5,7 +5,9 @@ from base import BaseModel
 from .fb_resnets import ResNet
 from .fb_resnets import ResNeXt
 from .fb_resnets import Expert_ResNet
-from .fb_resnets import Expert_ResNeXt 
+from .fb_resnets import Expert_ResNeXt
+from .reactnet_imagenet import reactnet
+from .Expert_ReActNet import reactnet as Expert_reactnet
 from .ldam_drw_resnets import resnet_cifar
 from .ldam_drw_resnets import expert_resnet_cifar 
 

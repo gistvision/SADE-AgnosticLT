@@ -1,13 +1,11 @@
 {
-    "name": "ImageNet_LT_ResNeXt50_SADE",
+    "name": "ImageNet_LT_reactnet",
     "n_gpu": 1,
 
     "arch": {
-        "type": "ResNeXt50Model",
+        "type": "ReActNet",
         "args": {
             "num_classes": 1000,
-            "reduce_dimension": true,
-            "use_norm": true,
             "returns_feat": true,
             "num_experts": 3
         }
@@ -16,9 +14,9 @@
         "type": "ImageNetLTDataLoader",
         "args":{
             "data_dir": "./data/imagenet",
-            "batch_size": 16,
+            "batch_size": 64,
             "shuffle": true,
-            "num_workers": 0
+            "num_workers": 4
         }
     },
     "optimizer": {
