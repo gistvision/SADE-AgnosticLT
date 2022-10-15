@@ -1,22 +1,21 @@
 {
-    "name": "ImageNet_LT_reactnet",
+    "name": "Places_LT_reactnet",
     "n_gpu": 1,
 
     "arch": {
         "type": "ReActNet",
         "args": {
-            "num_classes": 1000,
+            "num_classes": 365,
             "returns_feat": true,
             "num_experts": 3
         }
     },
     "data_loader": {
-        "type": "ImageNetLTDataLoader",
+        "type": "Places_LT",
         "args":{
-            "data_dir": "./data/imagenet",
+            "data_dir": "./data/Place365",
             "batch_size": 128,
-            "shuffle": true,
-            "num_workers": 4
+            "num_workers": 8
         }
     },
     "optimizer": {
@@ -38,14 +37,14 @@
     "lr_scheduler": {
         "type": "CosineAnnealingLR",
         "args": {
-            "T_max": 180,
+            "T_max": 30,
             "eta_min": 0
         }
     },
     "trainer": {
-        "epochs": 180,
-        "save_dir": "saved/imagenet/reactnet/",
-        "save_period": 180,
+        "epochs": 30,
+        "save_dir": "saved/places/reactnet/",
+        "save_period": 30,
         "verbosity": 2,
         "monitor": "max val_accuracy",
         "tensorboard": false
