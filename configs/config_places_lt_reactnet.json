@@ -13,15 +13,16 @@
     "data_loader": {
         "type": "Places_LT",
         "args":{
-            "data_dir": "./data/Place365",
-            "batch_size": 128,
-            "num_workers": 8
+            "data_dir": "./data/places",
+            "batch_size": 16,
+            "num_workers": 0
         }
     },
     "optimizer": {
         "type": "Adam",
         "args":{
-            "lr": 0.01
+            "lr": 0.01,
+            "share_lr": 0.001
         }
     },
     "add_extra_info": true,

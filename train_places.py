@@ -69,6 +69,7 @@ def main(config):
     # build optimizer, learning rate scheduler.  
     conv4_params = []
     linear_params =[]
+
     for pname, p in model.named_parameters():
         if  'layer4s'  in pname:
             conv4_params += [p]
@@ -78,13 +79,11 @@ def main(config):
     params_id = list(map(id, conv4_params)) + list(map(id, linear_params))
     base_parameters = list(filter(lambda p:id(p) not in params_id, model.parameters()))
     
-    optimizer = torch.optim.SGD([ {'params': base_parameters, 'lr': config['optimizer']['args']['share_lr']},
+    optimizer = torch.optim.Adam([ {'params': base_parameters, 'lr': config['optimizer']['args']['share_lr']},
                                   {'params': conv4_params, 'lr': config['optimizer']['args']['share_lr']},
                                   {'params': linear_params, 'lr': config['optimizer']['args']['lr']}], 
-                                  lr=config['optimizer']['args']['lr'],
-                                  momentum=config['optimizer']['args']['momentum'],
-                                  weight_decay=config['optimizer']['args']['weight_decay'],
-                                  nesterov=config['optimizer']['args']['nesterov'])
+                                  lr=config['optimizer']['args']['lr']
+                                 )
 
  
     lr_scheduler = learing_rate_scheduler(optimizer, config)
