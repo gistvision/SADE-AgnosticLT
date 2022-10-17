@@ -5,6 +5,8 @@ import data_loader.data_loaders as module_data
 import model.loss as module_loss
 import model.metric as module_metric
 import model.model as module_arch
+import model.Expert_ReActNet as reactnet
+
 import numpy as np
 from parse_config import ConfigParser
 
@@ -22,10 +24,11 @@ def main(config):
     )
 
     # build model architecture
-    if 'returns_feat' in config['arch']['args']:
-        model = config.init_obj('arch', module_arch, allow_override=True, returns_feat=False)
-    else:
-        model = config.init_obj('arch', module_arch) 
+    # if 'returns_feat' in config['arch']['args']:
+    #     model = config.init_obj('arch', module_arch, allow_override=True, returns_feat=False)
+    # else:
+    #     model = config.init_obj('arch', module_arch)
+    model = reactnet.reactnet(**dict(config['arch']['args']))
 
     # get function handles of loss and metrics 
     metric_fns = [getattr(module_metric, met) for met in config['metrics']]
@@ -64,7 +67,8 @@ def main(config):
         for i, (data, target) in enumerate(tqdm(data_loader)):
             data, target = data.to(device), target.to(device)
             output = model(data)
-  
+            if type(output) == dict:
+                output = output['output']
             batch_size = data.shape[0] 
             for i, metric in enumerate(metric_fns):
                 total_metrics[i] += metric(output, target) * batch_size
