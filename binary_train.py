@@ -4,6 +4,8 @@ import pprint
 import torch
 import numpy as np
 import data_loader.data_loaders as module_data
+from custum_data.new_dataset import get_dataset
+
 import model.loss as module_loss
 import model.metric as module_metric
 import model.model as module_arch
@@ -21,12 +23,15 @@ if deterministic:
     np.random.seed(SEED)
 
 
+
 def learing_rate_scheduler(optimizer, config):
-    if "type" in config._config["lr_scheduler"]: 
-        if config["lr_scheduler"]["type"] == "CustomLR": # linear learning rate decay
+    if "type" in config._config["lr_scheduler"]:
+        if config["lr_scheduler"]["type"] == "CustomLR":  # linear learning rate decay
             lr_scheduler_args = config["lr_scheduler"]["args"]
             gamma = lr_scheduler_args["gamma"] if "gamma" in lr_scheduler_args else 0.1
-            print("Scheduler step1, step2, warmup_epoch, gamma:", (lr_scheduler_args["step1"], lr_scheduler_args["step2"], lr_scheduler_args["warmup_epoch"], gamma))
+            print("Scheduler step1, step2, warmup_epoch, gamma:",
+                  (lr_scheduler_args["step1"], lr_scheduler_args["step2"], lr_scheduler_args["warmup_epoch"], gamma))
+
             def lr_lambda(epoch):
                 if epoch >= lr_scheduler_args["step2"]:
                     lr = gamma * gamma
@@ -40,9 +45,11 @@ def learing_rate_scheduler(optimizer, config):
                 if epoch < warmup_epoch:
                     lr = lr * float(1 + epoch) / warmup_epoch
                 return lr
+
             lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
         else:
-            lr_scheduler = config.init_obj('lr_scheduler', torch.optim.lr_scheduler, optimizer)  # cosine learning rate decay
+            lr_scheduler = config.init_obj('lr_scheduler', torch.optim.lr_scheduler,
+                                           optimizer)  # cosine learning rate decay
     else:
         lr_scheduler = None
     return lr_scheduler
@@ -52,8 +59,14 @@ def main(config):
     logger = config.get_logger('train')
 
     # setup data_loader instances
-    data_loader = config.init_obj('data_loader', module_data)
-    valid_data_loader = data_loader.split_validation()
+    if args.dataset in ['imagenet', 'inat', 'places', 'cifar10', 'cifar100']:
+        data_loader = config.init_obj('data_loader', module_data)
+        valid_data_loader = data_loader.split_validation()
+        cls_num_list = data_loader.cls_num_list
+    else:
+        train_loader = get_dataset(phase='train', dataset=args.dataset, imb_ratio=args.imb_ratio, random_seed=SEED)
+        valid_data_loader = get_dataset(phase='val', dataset=args.dataset, imb_ratio=args.imb_ratio, random_seed=SEED)
+        cls_num_list = train_loader.dataset.get_cls_num_list()
 
     # build model architecture, then print to console
     # model = config.init_obj('arch', module_arch)
@@ -62,16 +75,18 @@ def main(config):
 
     # get function handles of loss and metrics
     loss_class = getattr(module_loss, config["loss"]["type"])
+
     if hasattr(loss_class, "require_num_experts") and loss_class.require_num_experts:
-        criterion = config.init_obj('loss', module_loss, cls_num_list=data_loader.cls_num_list, num_experts=config["arch"]["args"]["num_experts"])
+        criterion = config.init_obj('loss', module_loss, cls_num_list=cls_num_list,
+                                    num_experts=config["arch"]["args"]["num_experts"])
     else:
-        criterion = config.init_obj('loss', module_loss, cls_num_list=data_loader.cls_num_list)
+        criterion = config.init_obj('loss', module_loss, cls_num_list=cls_num_list)
     metrics = [getattr(module_metric, met) for met in config['metrics']]
 
     # build optimizer, learning rate scheduler.  
     optimizer = config.init_obj('optimizer', torch.optim, model.parameters())
     lr_scheduler = learing_rate_scheduler(optimizer, config)
- 
+
     trainer = Trainer(model, criterion, metrics, optimizer,
                       config=config,
                       data_loader=data_loader,
@@ -89,6 +104,8 @@ if __name__ == '__main__':
                       help='path to latest checkpoint (default: None)')
     args.add_argument('-d', '--device', default=None, type=str,
                       help='indices of GPUs to enable (default: all)')
+    args.add_argument('--dataset', type=str, default='cifar10')
+    args.add_argument('--imb_ratio', type=float, default=0.1)
 
     # custom cli options to modify configuration from default values given in json file.
     CustomArgs = collections.namedtuple('CustomArgs', 'flags type target')
@@ -106,8 +123,9 @@ if __name__ == '__main__':
         CustomArgs(['--layer2_dimension'], type=int, target='arch;args;layer2_output_dim'),
         CustomArgs(['--layer3_dimension'], type=int, target='arch;args;layer3_output_dim'),
         CustomArgs(['--layer4_dimension'], type=int, target='arch;args;layer4_output_dim'),
-        CustomArgs(['--num_experts'], type=int, target='arch;args;num_experts') 
+        CustomArgs(['--num_experts'], type=int, target='arch;args;num_experts')
     ]
     config = ConfigParser.from_args(args, options)
+    args = args.parse_args()
     pprint.pprint(config)
     main(config)

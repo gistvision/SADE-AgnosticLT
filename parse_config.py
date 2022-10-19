@@ -8,6 +8,21 @@ from logger import setup_logging
 from utils import read_json, write_json
 
 
+num_class_dict = {
+    'cifar10': 10,
+    'cifar100': 100,
+    'cub': 200,
+    'imagenet': 1000,
+    'inat': 8142,
+    'fgvc': 100,
+    'dogs': 120,
+    'cars': 196,
+    'flowers': 102,
+    'dtd': 47,
+    'caltech101': 102,
+    'places': 365,
+    'fruits': 24,
+}
 class ConfigParser:
     def __init__(self, config, resume=None, modification=None, load_crt=None, run_id=None):
         """
@@ -83,6 +98,15 @@ class ConfigParser:
 
         # parse custom cli options into dictionary
         modification = {opt.target : getattr(args, _get_opt_name(opt.flags)) for opt in options}
+        dataset = args.dataset
+        config["arch"]["args"]["num_classes"] = num_class_dict[dataset]
+        config["data_loader"]["type"] = dataset
+        # config["data_loader"]["args"]["data_dir"] =config["data_loader"]["args"]["data_dir"] + dataset
+        dataset = args.dataset + '_' + (str)(args.imb_ratio)
+        config["name"] = config["name"].replace('DEFAULT', dataset)
+        config["trainer"]["save_dir"] = config["trainer"]["save_dir"].replace('DEFAULT', dataset)
+
+
         return cls(config, resume, modification, load_crt=load_crt)
 
     def init_obj(self, name, module, *args, allow_override=False, **kwargs):

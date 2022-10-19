@@ -16,15 +16,29 @@ class CIFAR100DataLoader(DataLoader):
         normalize = transforms.Normalize(mean=[0.5070751592371323, 0.48654887331495095, 0.4409178433670343],
             std=[0.2673342858792401, 0.2564384629170883, 0.27615047132568404])
         train_trsfm = transforms.Compose([
-            transforms.RandomCrop(32, padding=4),
+            transforms.RandomResizedCrop(224),
             transforms.RandomHorizontalFlip(),
             transforms.RandomRotation(15),
             transforms.ToTensor(),
-            normalize,
+            normalize
         ])
+        # train_trsfm = transforms.Compose([
+        #     transforms.RandomCrop(32, padding=4),
+        #     transforms.RandomHorizontalFlip(),
+        #     transforms.RandomRotation(15),
+        #     transforms.ToTensor(),
+        #     normalize,
+        # ])
+
+        # test_trsfm = transforms.Compose([
+        #     transforms.ToTensor(),
+        #     normalize,
+        # ])
         test_trsfm = transforms.Compose([
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
             transforms.ToTensor(),
-            normalize,
+            normalize
         ])
         if training:
             self.dataset = datasets.CIFAR100(data_dir, train=training, download=True, transform=train_trsfm)
@@ -97,15 +111,29 @@ class ImbalanceCIFAR100DataLoader(DataLoader):
         normalize = transforms.Normalize(mean=[0.4914, 0.4822, 0.4465],
             std=[0.2023, 0.1994, 0.2010])
         train_trsfm = transforms.Compose([
-            transforms.RandomCrop(32, padding=4),
+            transforms.RandomResizedCrop(224),
             transforms.RandomHorizontalFlip(),
             transforms.RandomRotation(15),
             transforms.ToTensor(),
-            normalize,
+            normalize
         ])
+        # train_trsfm = transforms.Compose([
+        #     transforms.RandomCrop(32, padding=4),
+        #     transforms.RandomHorizontalFlip(),
+        #     transforms.RandomRotation(15),
+        #     transforms.ToTensor(),
+        #     normalize,
+        # ])
+
+        # test_trsfm = transforms.Compose([
+        #     transforms.ToTensor(),
+        #     normalize,
+        # ])
         test_trsfm = transforms.Compose([
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
             transforms.ToTensor(),
-            normalize,
+            normalize
         ])
         test_dataset = datasets.CIFAR100(data_dir, train=False, download=True, transform=test_trsfm) # test set
         
@@ -163,15 +191,29 @@ class  TestAgnosticImbalanceCIFAR100DataLoader(DataLoader):
         normalize = transforms.Normalize(mean=[0.4914, 0.4822, 0.4465],
             std=[0.2023, 0.1994, 0.2010])
         train_trsfm = transforms.Compose([
-            transforms.RandomCrop(32, padding=4),
+            transforms.RandomResizedCrop(224),
             transforms.RandomHorizontalFlip(),
             transforms.RandomRotation(15),
             transforms.ToTensor(),
-            normalize,
+            normalize
         ])
+        # train_trsfm = transforms.Compose([
+        #     transforms.RandomCrop(32, padding=4),
+        #     transforms.RandomHorizontalFlip(),
+        #     transforms.RandomRotation(15),
+        #     transforms.ToTensor(),
+        #     normalize,
+        # ])
+
+        # test_trsfm = transforms.Compose([
+        #     transforms.ToTensor(),
+        #     normalize,
+        # ])
         test_trsfm = transforms.Compose([
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
             transforms.ToTensor(),
-            normalize,
+            normalize
         ])
         test_dataset = datasets.CIFAR100(data_dir, train=False, download=True, transform=test_trsfm) # test set
         
@@ -232,19 +274,33 @@ class ImbalanceCIFAR10DataLoader(DataLoader):
         normalize = transforms.Normalize(mean=[0.4914, 0.4822, 0.4465],
             std=[0.2023, 0.1994, 0.2010])
         train_trsfm = transforms.Compose([
-            transforms.RandomCrop(32, padding=4),
+            transforms.RandomResizedCrop(224),
             transforms.RandomHorizontalFlip(),
             transforms.RandomRotation(15),
             transforms.ToTensor(),
-            normalize,
+            normalize
         ])
+        # train_trsfm = transforms.Compose([
+        #     transforms.RandomCrop(32, padding=4),
+        #     transforms.RandomHorizontalFlip(),
+        #     transforms.RandomRotation(15),
+        #     transforms.ToTensor(),
+        #     normalize,
+        # ])
+
+        # test_trsfm = transforms.Compose([
+        #     transforms.ToTensor(),
+        #     normalize,
+        # ])
         test_trsfm = transforms.Compose([
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
             transforms.ToTensor(),
-            normalize,
+            normalize
         ])
-        
+
         if training:
-            dataset = IMBALANCECIFAR10(data_dir, train=True, download=True, transform=train_trsfm, imb_factor=0.01)
+            dataset = IMBALANCECIFAR10(data_dir, train=True, download=True, transform=train_trsfm, imb_factor=imb_factor)
             val_dataset = datasets.CIFAR10(data_dir, train=False, download=True, transform=test_trsfm) # test set
         else:
             dataset = datasets.CIFAR10(data_dir, train=False, download=True, transform=test_trsfm) # test set
