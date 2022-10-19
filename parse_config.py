@@ -101,6 +101,7 @@ class ConfigParser:
         dataset = args.dataset
         config["arch"]["args"]["num_classes"] = num_class_dict[dataset]
         config["data_loader"]["type"] = dataset
+        config["data_loader"]["args"]["imb_factor"] = args.imb_ratio
         # config["data_loader"]["args"]["data_dir"] =config["data_loader"]["args"]["data_dir"] + dataset
         dataset = args.dataset + '_' + (str)(args.imb_ratio)
         config["name"] = config["name"].replace('DEFAULT', dataset)

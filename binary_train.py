@@ -105,7 +105,7 @@ if __name__ == '__main__':
     args.add_argument('-d', '--device', default=None, type=str,
                       help='indices of GPUs to enable (default: all)')
     args.add_argument('--dataset', type=str, default='cifar10')
-    args.add_argument('--imb_ratio', type=float, default=0.1)
+    args.add_argument('--imb_ratio', type=float, default=1.0)
 
     # custom cli options to modify configuration from default values given in json file.
     CustomArgs = collections.namedtuple('CustomArgs', 'flags type target')
